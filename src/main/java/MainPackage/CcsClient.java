@@ -1,13 +1,6 @@
 package MainPackage;
 
-import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.cloud.FirestoreClient;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ExtensionElementProvider;
@@ -23,9 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.xmlpull.v1.XmlPullParser;
 
 import javax.net.ssl.SSLContext;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -42,10 +33,11 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
     private final String apiKey;
     private final boolean debuggable;
     private final String userName;
-    private Firestore fStore;
     private boolean isConnectionDraining;
+
     // downstream messages to sync with acks and nacks
     private final Map<String, FcmMessage> syncMessages = new ConcurrentHashMap<>();
+
     // messages from backoff failures
     private final Map<String, FcmMessage> pendingMessages = new ConcurrentHashMap<>();
 
@@ -61,18 +53,6 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
         this.apiKey = apiKey;
         this.debuggable = debuggable;
         this.userName = projectId + "@" + Utils.FCM_SERVER_AUTH_CONNECTION;
-
-        try {
-            InputStream serviceAccount = new FileInputStream("cafe-y-vino-cd225830cdc2.json");
-            GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(credentials)
-                    .build();
-            FirebaseApp.initializeApp(options);
-            fStore = FirestoreClient.getFirestore();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -186,6 +166,7 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
         final String json = fcmPacket.getJson();
         final Map<String, Object> jsonMap = MessageMapper.toMapFromJsonString(json);
 
+        assert jsonMap != null;
         final Optional<Object> messageTypeObj = Optional.ofNullable(jsonMap.get("message_type"));
         if (!messageTypeObj.isPresent()) {
             UpstreamMessage upMsg = MessageMapper.upstreamMessageFrom(jsonMap);
@@ -337,34 +318,27 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
 
         // handle the message according to its type
         if (type.equals(Utils.TO_CLIENT)) {
+            logger.info("to client received");
             final String messageId = Utils.getUniqueMessageId();
             final Map<String, String> data = upMsg.getDataPayload();
             final String to = data.get(Utils.TOKEN);
             DownstreamMessage downMsg = new DownstreamMessage(to, messageId, data);
             final String jsonRequest = MessageMapper.toJsonString(downMsg);
             sendDownstreamMessage(messageId, jsonRequest);
+
         } else if (type.equals(Utils.TO_ADMIN)) {
-            logger.info("the message is to admin, getting the data from firestore");
+
+            logger.info("to admin type received");
+
             final Map<String, String> data = upMsg.getDataPayload();
-            logger.info("about to create an ApiFuture object (query)...");
-            ApiFuture<QuerySnapshot> query = fStore.collection("administradores").get();
-            logger.info("called the get() method on the ApiFuture query...");
-            try {
-                List<QueryDocumentSnapshot> documents = query.get().getDocuments();
-                logger.info("we got our documents from the administradores collection, ready to iteratre through them");
-                for (QueryDocumentSnapshot document : documents) {
-                    final String messageId = Utils.getUniqueMessageId();
-                    final String to = document.getString(Utils.TOKEN);
-                    logger.info("retrieved a token: {}", to);
-                    DownstreamMessage downMsg = new DownstreamMessage(to, messageId, data);
-                    final String jsonRequest = MessageMapper.toJsonString(downMsg);
-                    logger.info("a jsonRequest is composed: {}", jsonRequest);
-                    sendDownstreamMessage(messageId, jsonRequest);
-                    logger.info("message to this admin is sent");
-                }
-            } catch (Exception e) {
-                logger.info("failed to get documents. error:: {}", e.getLocalizedMessage());
+
+            for (String token : Utils.ADMINS) {
+                final String messageId = Utils.getUniqueMessageId();
+                DownstreamMessage downstreamMessage = new DownstreamMessage(token, messageId, data);
+                final String jsonRequest = MessageMapper.toJsonString(downstreamMessage);
+                sendDownstreamMessage(messageId, jsonRequest);
             }
+
         }
     }
 
