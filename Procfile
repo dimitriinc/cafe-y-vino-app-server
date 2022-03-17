@@ -1,1 +1,0 @@
-web: java -jar target/xmpp-server-jar-with-dependencies.jar
