@@ -74,7 +74,7 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
 
         final XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
         logger.info("Connecting to the server ...");
-        config.setXmppDomain("jabb3r.de");
+        config.setXmppDomain("foo");
         config.setHost(Utils.FCM_SERVER);
         config.setPort(Utils.FCM_PORT);
         config.setSendPresence(false);
