@@ -3,20 +3,21 @@ package MainPackage;
 import java.util.Random;
 
 public class Utils {
-    public static final String FCM_SERVER = "fcm-xmpp.googleapis.com"; // prod
-    public static final int FCM_PORT = 5235; // prod
+    public static final String FCM_SERVER = "fcm-xmpp.googleapis.com";
+    public static final int FCM_PORT = 5235;
     public static final String FCM_ELEMENT_NAME = "gcm";
     public static final String FCM_NAMESPACE = "google:mobile:data";
     public static final String FCM_SERVER_AUTH_CONNECTION = "gcm.googleapis.com";
     public static final String TOKEN = "token";
     public static final String TO_ADMIN = "toAdmin";
     public static final String TO_CLIENT = "toClient";
-    public static final String ADMIN_REGISTRATION = "admin_registration";
+    public static final String TO_ADMIN_NEW = "toAdminNew";
+    public static final String ADMIN_TOKEN = "adminToken";
 
     public static final String[] ADMINS =
-            {"cV8T95TgQNqhH4-28pKx-p:APA91bEA3ymNuYYCdWcS0L_81op8udfTIkWUj7RxGZYbM4JrfVPliM5kq5Hn444ssXZsh7HCu0IJeYfzMV1v0vvJs9drtuFU_8GEyPaIDQHBJyUoCvOnWd3V3EUiv-gQvESCREvnhi4e",
-            "fz4GIRrWSfSV_KEmwxRGAD:APA91bEyiRn_bfpf1PUJUk1_Bo2RNNIDxcvUfUZGRJoPc2grsXMbYBaNq9miSU8obKPN4c2GkqBNloSLCPZLXWGCaKV6Ft_Z3KCodu7znNpiUQRY5H0iQOw1Rn11GUd4ppRQITfYbpxJ",
-            "e4WeHLJeRCeRGtoSS2-sH9:APA91bHkHB1q3MgPalHlrGxLTUEhyASTI8exlnlN_hE2eXEZmf6JfpnGUL-iuU6yhke4CN1p8zLsJbRJR_3VXOKl8Grjz3vmeYXj9tisSwMml-itBd7XrH-PNYHnboke3tZwrQ_SP0np"};
+            {"cwt7J3v2TGaoUJtY2vlyO5:APA91bHeZL7tlCmILmUQC2LK_VmudHFMnnDYYMtesdafZPLe-6WLZBN7TRkUDNoD16f0OWHquZgsC4nzfOnmyONl7rjRxKwLjrYuuVfeqzw8pGCuieGg7WIMYUbdMr3EJ4pufU4wg1bE",
+            "d8wL1YCHSlqPQ6rZtlkxCR:APA91bEHNNYB5adD6QJ0TgDZ0uFSaVkoPB60XR9cUrGd8GmY9QCgIQfs-af__neADCAIm_zjIco0WiLT7HnBz9fDA1XgOnNK9pcBA2yZdaCOkuBDXByscy6pWnH_C_u0suGOGx6PD7eF",
+            "cfCFX4YNQhaGSr4qlVRHyB:APA91bFK-hD2GXxlCzVq_stkuIuMD9QoABMWd1QFM52NKaw9YstCepLaw5uIICvdxZg2KX7gyVtvWyQk33_TwBOAyjQA415L4vnM-yg_7E-EOsotQBdUbOYY2eTa4fzTcfgeV34e-tdU"};
 
     public static String getUniqueMessageId() {
         return "m-" + new Random().nextLong();

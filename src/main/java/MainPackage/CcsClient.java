@@ -1,6 +1,5 @@
 package MainPackage;
 
-import com.google.cloud.firestore.Firestore;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ExtensionElementProvider;
@@ -74,7 +73,7 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
 
         final XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration.builder();
         logger.info("Connecting to the server ...");
-        config.setXmppDomain("foo");
+        config.setXmppDomain("jabb3r.de");
         config.setHost(Utils.FCM_SERVER);
         config.setPort(Utils.FCM_PORT);
         config.setSendPresence(false);
@@ -91,12 +90,11 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
             logger.info("Failed to connect:  {}", e.getLocalizedMessage());
         }
 
-        // Enable automatic reconnection and add the listener (if not, remove the listener, the
-        // interface and the override methods)
+        // Enable automatic reconnection and add the listener
         ReconnectionManager.getInstanceFor(connection).enableAutomaticReconnection();
         ReconnectionManager.getInstanceFor(connection).addReconnectionListener(this);
 
-        // Disable Roster at login (in XMPP the contact list is called a "roster")
+        // Disable Roster at login
         Roster.getInstanceFor(connection).setRosterLoadedAtLogin(false);
 
         // Security checks
@@ -317,28 +315,49 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
         sendAck(ackJsonRequest);
 
         // handle the message according to its type
-        if (type.equals(Utils.TO_CLIENT)) {
-            logger.info("to client received");
-            final String messageId = Utils.getUniqueMessageId();
-            final Map<String, String> data = upMsg.getDataPayload();
-            final String to = data.get(Utils.TOKEN);
-            DownstreamMessage downMsg = new DownstreamMessage(to, messageId, data);
-            final String jsonRequest = MessageMapper.toJsonString(downMsg);
-            sendDownstreamMessage(messageId, jsonRequest);
+        switch (type) {
+            case Utils.TO_CLIENT: {
 
-        } else if (type.equals(Utils.TO_ADMIN)) {
+                logger.info("to client received");
 
-            logger.info("to admin type received");
-
-            final Map<String, String> data = upMsg.getDataPayload();
-
-            for (String token : Utils.ADMINS) {
                 final String messageId = Utils.getUniqueMessageId();
-                DownstreamMessage downstreamMessage = new DownstreamMessage(token, messageId, data);
-                final String jsonRequest = MessageMapper.toJsonString(downstreamMessage);
-                sendDownstreamMessage(messageId, jsonRequest);
-            }
+                final Map<String, String> data = upMsg.getDataPayload();
+                final String to = data.get(Utils.TOKEN);
 
+                DownstreamMessage downMsg = new DownstreamMessage(to, messageId, data);
+                final String jsonRequest = MessageMapper.toJsonString(downMsg);
+                sendDownstreamMessage(messageId, jsonRequest);
+
+                break;
+            }
+            case Utils.TO_ADMIN: {
+
+                logger.info("to admin type received");
+
+                final Map<String, String> data = upMsg.getDataPayload();
+
+                for (String token : Utils.ADMINS) {
+                    final String messageId = Utils.getUniqueMessageId();
+                    DownstreamMessage downstreamMessage = new DownstreamMessage(token, messageId, data);
+                    final String jsonRequest = MessageMapper.toJsonString(downstreamMessage);
+                    sendDownstreamMessage(messageId, jsonRequest);
+                }
+
+                break;
+            }
+            case Utils.TO_ADMIN_NEW: {
+
+                logger.info("new to admin type received");
+
+                final String messageId = Utils.getUniqueMessageId();
+                final Map<String, String> data = upMsg.getDataPayload();
+                final String to = data.get(Utils.ADMIN_TOKEN);
+
+                DownstreamMessage downMsg = new DownstreamMessage(to, messageId, data);
+                final String jsonRequest = MessageMapper.toJsonString(downMsg);
+                sendDownstreamMessage(messageId, jsonRequest);
+                break;
+            }
         }
     }
 

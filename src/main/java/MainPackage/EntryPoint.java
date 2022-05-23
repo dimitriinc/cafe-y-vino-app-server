@@ -33,8 +33,8 @@ public class EntryPoint extends CcsClient {
     }
 
     public static void main(String[] args) {
-        final String fcmProjectSenderId = "check the firebase account";
-        final String fcmServerKey = "check the firebase account";
+        final String fcmProjectSenderId = "1096226926741";
+        final String fcmServerKey = "AAAA_zw3cJU:APA91bGKWeyveEy2sdDcGVy3VyHMOeR_-8nVqxsdEKFbOlzBqDtaVJG7jajch-Qlt6tM2_gxKo9qNHUrKNFilWXejhJ98qh7EkBn7uRldbeNMJK8x4wSPpKCQpe6hFg5UFVC5U43wVrD";
         new EntryPoint(fcmProjectSenderId, fcmServerKey, false);
     }
 }
