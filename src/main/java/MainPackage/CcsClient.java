@@ -316,6 +316,7 @@ public class CcsClient implements StanzaListener, ReconnectionListener, Connecti
 
         // handle the message according to its type
         switch (type) {
+
             case Utils.TO_CLIENT: {
 
                 logger.info("to client received");
