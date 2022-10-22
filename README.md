@@ -6,7 +6,7 @@ Slightly simplified and adjusted for the needs of the Cafe y Vino system.
 
 ## Summary
 
-The purpose of the client is to link the [customer side](https://github.com/dimitriinc/cafe-y-vino-app-client) of the Cafe y Vino system to the [administrator side](https://github.com/dimitriinc/cafe-y-vino-app-admin), so that they can exchange messages.
+The purpose of the client is to link the [customer side](https://github.com/dimitriinc/cafe-y-vino-app-client-kotlin) of the Cafe y Vino system to the [administrator side](https://github.com/dimitriinc/cafe-y-vino-app-admin), so that they can exchange messages.
 Connects to FCM backend through a TCP connection and listens for upstream messages. On receiving one, sends back an ACK to the FCM and checks the type of the message, stored in the data payload. There are two types:
 
 - _from customer to admin message_ - on reception: a downstream stanza is created with the data payload copied from the upstream message, and sent to the array of administrators' registration tokens, one for each administrator;
